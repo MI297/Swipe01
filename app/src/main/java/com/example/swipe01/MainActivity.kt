@@ -50,11 +50,11 @@ class MainActivity : ComponentActivity() {
 fun SwipeTwistScreen() {
     var swipeCount by remember { mutableStateOf(0) }
     val twistAnim = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(swipeCount) {
-        // アニメーションで値を滑らかに変える
         twistAnim.animateTo(
-            targetValue = swipeCount / 2f, // ねじれ具合
+            targetValue = swipeCount / 2f,
             animationSpec = tween(durationMillis = 400, easing = LinearOutSlowInEasing)
         )
     }
@@ -73,12 +73,13 @@ fun SwipeTwistScreen() {
         modifier = gestureModifier.background(Color.White),
         contentAlignment = Alignment.Center
     ) {
+        // 線描画（Canvas）
         Canvas(modifier = Modifier.fillMaxSize()) {
             val centerX = size.width / 2f
             val heightStep = 40f
             val totalSteps = (size.height / heightStep).toInt()
-
             val path = Path()
+
             for (i in 0 until totalSteps) {
                 val startY = i * heightStep
                 val endY = (i + 1) * heightStep
@@ -98,6 +99,7 @@ fun SwipeTwistScreen() {
             )
         }
 
+        // カウント表示
         Text(
             text = "カウント: $swipeCount",
             color = Color.Black,
@@ -106,5 +108,24 @@ fun SwipeTwistScreen() {
                 .align(Alignment.TopCenter)
                 .padding(top = 16.dp)
         )
+
+        //  リセットボタン（画面左下）
+        Button(
+            onClick = {
+                swipeCount = 0
+                scope.launch {
+                    twistAnim.animateTo(
+                        targetValue = 0f,
+                        animationSpec = tween(durationMillis = 300)
+                    )
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(16.dp)
+                .size(width = 120.dp, height = 36.dp)
+        ) {
+            Text("リセット", fontSize = 12.sp)
+        }
     }
 }
