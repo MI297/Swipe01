@@ -141,7 +141,7 @@ fun SwipeTwistScreen() {
                 .padding(16.dp)
                 .size(width = 1200.dp, height = 360.dp)
         ) {
-            Text("リセット", fontSize = 12.sp)
+            Text("!!!リセット!!!", fontSize = 12.sp)
         }
     }
 }
