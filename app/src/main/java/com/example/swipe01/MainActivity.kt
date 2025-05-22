@@ -1,5 +1,4 @@
 package com.example.swipe01
-// test0522---
 // Compose 基本要素
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -139,7 +138,7 @@ fun SwipeTwistScreen() {
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(16.dp)
-                .size(width = 1200.dp, height = 360.dp)
+                .size(width = 120.dp, height = 36.dp)
         ) {
             Text("!!!リセット!!!", fontSize = 12.sp)
         }
