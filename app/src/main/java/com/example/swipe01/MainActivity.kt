@@ -1,5 +1,5 @@
 package com.example.swipe01
-
+// test0522---
 // Compose 基本要素
 import android.os.Bundle
 import androidx.activity.ComponentActivity
