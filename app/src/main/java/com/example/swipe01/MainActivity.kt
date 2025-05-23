@@ -1,4 +1,5 @@
 package com.example.swipe01
+
 // Compose 基本要素
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,28 +13,23 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-// 描画関連（Canvas、Path、Strokeなど）
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.Stroke
-//アニメーション描画
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.LinearOutSlowInEasing
-import kotlinx.coroutines.launch
-// ポインター操作（スワイプ検出）
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
-// 単位（dp, sp）
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-// 三角関数
 import kotlin.math.sin
-import com.example.swipe01.ui.theme.Swipe01Theme
+import kotlin.math.abs
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
-
+import com.example.swipe01.ui.theme.Swipe01Theme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,99 +44,94 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-
 @Composable
 fun SwipeTwistScreen() {
     var swipeCount by remember { mutableStateOf(0) }
     val twistAnim = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
-
-    LaunchedEffect(swipeCount) {
-        twistAnim.animateTo(
-            targetValue = swipeCount / 2f,
-            animationSpec = tween(durationMillis = 400, easing = LinearOutSlowInEasing)
-        )
-    }
+    var accumulatedDrag by remember { mutableStateOf(0f) }
 
     val gestureModifier = Modifier
         .fillMaxSize()
         .pointerInput(Unit) {
-            detectHorizontalDragGestures { _, dragAmount ->
-                if (dragAmount > 50) {
+            detectHorizontalDragGestures(
+                onHorizontalDrag = { _, dragAmount ->
+                    accumulatedDrag += dragAmount
+                },
+                onDragEnd = {
+                    val dragMagnitude = accumulatedDrag
+                    accumulatedDrag = 0f
                     swipeCount = (swipeCount + 1).coerceAtMost(1000)
+                    val normalized = (dragMagnitude / 300f).coerceIn(-5f, 5f)
+                    scope.launch {
+                        twistAnim.animateTo(
+                            targetValue = twistAnim.value + normalized,
+                            animationSpec = tween(durationMillis = 500, easing = LinearOutSlowInEasing)
+                        )
+                    }
                 }
-            }
+            )
         }
 
     Box(
         modifier = gestureModifier.background(Color.White),
         contentAlignment = Alignment.Center
     ) {
-
-        // 背景
         BackgroundFloatingDots(swipeCount = swipeCount)
 
-        // 線描画（Canvas）
         Canvas(modifier = Modifier.fillMaxSize()) {
             val centerX = size.width / 2f
             val heightStep = 20f
             val totalSteps = (size.height / heightStep).toInt()
             val centerIndex = totalSteps / 2
+            val chaosFactor = (swipeCount / 10f).coerceAtMost(20f)
 
             val path = Path()
             for (i in 0 until totalSteps) {
                 val startY = i * heightStep
                 val endY = (i + 1) * heightStep
 
-                // 中心に近いほど大きく揺れる（0〜1の範囲）
-                val distanceFromCenter = (i - centerIndex).toFloat()
-                val influence = 1f - (distanceFromCenter * distanceFromCenter) / (centerIndex * centerIndex)
+                val distance = (i - centerIndex).toFloat()
+                val influence = 1f - (distance * distance) / (centerIndex * centerIndex)
                 val clampedInfluence = influence.coerceIn(0f, 1f)
 
-                val offsetX = sin(i + twistAnim.value) * twistAnim.value * clampedInfluence
-
-                if (i == 0) {
-                    path.moveTo(centerX + offsetX, startY)
-                } else {
-                    path.lineTo(centerX + offsetX, endY)
+                if (swipeCount == 0) {
+                    if (i == 0) path.moveTo(centerX, startY)
+                    else path.lineTo(centerX, endY)
+                    continue
                 }
+
+                val twistOffset = sin(i + twistAnim.value * 5f) * twistAnim.value * clampedInfluence * chaosFactor
+                val randomJitter = 0f
+                val loopOffset = if (abs(distance) < 5f) {
+                    sin(i * 4f) * 20f * (1f - abs(distance) / 5f)
+                } else 0f
+                val offsetX = twistOffset + randomJitter + loopOffset
+
+                if (i == 0) path.moveTo(centerX + offsetX, startY)
+                else path.lineTo(centerX + offsetX, endY)
             }
 
-            drawPath(
-                path = path,
-                color = Color.Black,
-                style = Stroke(width = 8f)
-            )
+            drawPath(path = path, color = Color.Black, style = Stroke(width = 8f))
         }
 
-        // カウント表示
         Text(
             text = "カウント: $swipeCount",
             color = Color.Black,
             fontSize = 20.sp,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 16.dp)
+            modifier = Modifier.align(Alignment.TopCenter).padding(top = 16.dp)
         )
 
-        //  リセットボタン（画面左下）
         Button(
             onClick = {
-                swipeCount = 0
                 scope.launch {
-                    twistAnim.animateTo(
-                        targetValue = 0f,
-                        animationSpec = tween(durationMillis = 300)
-                    )
+                    twistAnim.animateTo(0f, tween(300))
+                    swipeCount = 0
                 }
             },
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(16.dp)
-                .size(width = 1200.dp, height = 360.dp)
+            modifier = Modifier.align(Alignment.BottomStart).padding(16.dp)
         ) {
-            Text("!!!リセット!!!", fontSize = 12.sp)
+            Text("リセット", fontSize = 12.sp)
         }
     }
 }
@@ -162,12 +153,11 @@ fun BackgroundFloatingDots(swipeCount: Int) {
         }
     }
 
-    // スワイプ時にスピードアップ
     LaunchedEffect(swipeCount) {
         dots.forEach { dot ->
             scope.launch {
                 dot.y.animateTo(
-                    targetValue = dot.y.value - 30f, // 少し浮かび上がる
+                    targetValue = dot.y.value - 30f,
                     animationSpec = tween(durationMillis = 500)
                 )
             }
@@ -180,9 +170,13 @@ fun BackgroundFloatingDots(swipeCount: Int) {
                 scope.launch {
                     val nextY = dot.y.value - 1f
                     val nextX = dot.x.value + (listOf(-1f, 0f, 1f).random())
-                    // 画面上に戻す
-                    dot.y.snapTo(if (nextY < 0) screenHeight.value else nextY)
-                    dot.x.snapTo(nextX.coerceIn(0f, screenWidth.value))
+                    if (nextY < -dot.radius) {
+                        dot.y.snapTo(screenHeight.value)
+                        dot.x.snapTo((0..screenWidth.value.toInt()).random().toFloat())
+                    } else {
+                        dot.y.snapTo(nextY)
+                        dot.x.snapTo(nextX.coerceIn(0f, screenWidth.value))
+                    }
                 }
             }
             delay(30)
@@ -209,4 +203,3 @@ data class DotState(
     val y: Animatable<Float, AnimationVector1D>,
     val radius: Float
 )
-
