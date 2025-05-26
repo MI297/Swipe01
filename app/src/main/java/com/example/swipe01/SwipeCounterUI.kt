@@ -1,3 +1,4 @@
+//カウント表示とリセットボタンのUIを担当する。
 package com.example.swipe01
 
 import androidx.compose.foundation.layout.*

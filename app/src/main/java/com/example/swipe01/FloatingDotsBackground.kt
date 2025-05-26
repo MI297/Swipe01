@@ -1,3 +1,4 @@
+//背景にふわふわ動く円（ドット）をアニメーション描画する。
 package com.example.swipe01
 
 import androidx.compose.foundation.Canvas
@@ -24,10 +25,11 @@ data class DotState(
 @Composable
 fun BackgroundFloatingDots(swipeCount: Int) {
     val scope = rememberCoroutineScope()
-    val dotCount = 10
+    val dotCount = 10   // ドットの数
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
+    // ドットの初期位置と半径をランダムに決定
     val dots = remember {
         List(dotCount) {
             DotState(
@@ -38,6 +40,7 @@ fun BackgroundFloatingDots(swipeCount: Int) {
         }
     }
 
+    // スワイプ時にドットがふわっと上に浮かぶ
     LaunchedEffect(swipeCount) {
         dots.forEach { dot ->
             scope.launch {
@@ -46,6 +49,7 @@ fun BackgroundFloatingDots(swipeCount: Int) {
         }
     }
 
+    // ドットがゆっくり上に動くループ処理
     LaunchedEffect(Unit) {
         while (true) {
             dots.forEach { dot ->
@@ -60,6 +64,7 @@ fun BackgroundFloatingDots(swipeCount: Int) {
         }
     }
 
+    // ドットを円として描画
     Canvas(modifier = Modifier.fillMaxSize()) {
         dots.forEach { dot ->
             drawCircle(

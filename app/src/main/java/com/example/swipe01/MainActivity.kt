@@ -1,3 +1,4 @@
+//アプリのメインエントリポイント。画面全体の構成と状態管理を行う。
 package com.example.swipe01
 
 import android.os.Bundle
@@ -36,18 +37,22 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun SwipeTwistScreen() {
-    var swipeCount by remember { mutableStateOf(0) }
-    val twistAnim = remember { Animatable(0f) }
-    val scope = rememberCoroutineScope()
 
+    var swipeCount by remember { mutableStateOf(0) }    // スワイプの回数を記録する変数
+    val twistAnim = remember { Animatable(0f) }     // 線のねじれ具合をアニメーションで表現する変数
+    val scope = rememberCoroutineScope()                        // コルーチンスコープ（非同期処理用）
+
+    // スワイプ回数に応じてアニメーションを変化させる
     LaunchedEffect(swipeCount) {
         twistAnim.animateTo(
             targetValue = swipeCount / 2f,
-            animationSpec = tween(400)
+            animationSpec = tween(400)          // アニメーション時間: 400ミリ秒
         )
     }
 
+    // 画面全体の構成を定義（Boxで重ね合わせ）
     Box(
+        // スワイプした時にカウントを増やす
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
@@ -56,8 +61,8 @@ fun SwipeTwistScreen() {
             },
         contentAlignment = Alignment.Center
     ) {
-        BackgroundFloatingDots(swipeCount)
-        TwistedLineCanvas(twistAnim.value)
-        SwipeCounterUI(swipeCount, { swipeCount = 0 }, scope, twistAnim)
+        BackgroundFloatingDots(swipeCount)          // 背景の円アニメーション
+        TwistedLineCanvas(twistAnim.value)          // 中央のねじれた線
+        SwipeCounterUI(swipeCount, { swipeCount = 0 }, scope, twistAnim)    // カウント表示＆リセット
     }
 }

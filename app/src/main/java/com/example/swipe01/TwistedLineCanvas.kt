@@ -1,3 +1,4 @@
+//スワイプ回数に応じて変形する線（ねじれた線）をCanvasで描画する。
 package com.example.swipe01
 
 import androidx.compose.foundation.Canvas
@@ -12,8 +13,8 @@ import kotlin.math.sin
 @Composable
 fun TwistedLineCanvas(twistValue: Float, modifier: Modifier = Modifier) {
     Canvas(modifier = modifier.fillMaxSize()) {
-        val centerX = size.width / 2f
-        val heightStep = 20f
+        val centerX = size.width / 2f   // 画面中央X座標
+        val heightStep = 20f            // 線を区切る高さの間隔
         val totalSteps = (size.height / heightStep).toInt()
         val centerIndex = totalSteps / 2
 
@@ -22,7 +23,7 @@ fun TwistedLineCanvas(twistValue: Float, modifier: Modifier = Modifier) {
             val startY = i * heightStep
             val endY = (i + 1) * heightStep
             val distanceFromCenter = (i - centerIndex).toFloat()
-            val influence = 1f - (distanceFromCenter * distanceFromCenter) / (centerIndex * centerIndex)
+            val influence = 1f - (distanceFromCenter * distanceFromCenter) / (centerIndex * centerIndex)    // 中心に近いほど大きく揺れるようにする補正
             val clampedInfluence = influence.coerceIn(0f, 1f)
             val offsetX = sin(i + twistValue) * twistValue * clampedInfluence
 
