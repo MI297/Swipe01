@@ -41,9 +41,10 @@ fun SwipeCounterUI(
         Button(
             onClick = {
                 onReset()
-                scope.launch {
-                    twistAnim.animateTo(0f, animationSpec = tween(300))
-                }
+                //重複している処理なので削除　（SwipeTwistScreen.kt）
+//                scope.launch {
+//                    twistAnim.animateTo(0f, animationSpec = tween(300))
+//                }
             },
             modifier = Modifier
                 .align(Alignment.Start)
