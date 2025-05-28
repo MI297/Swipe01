@@ -6,11 +6,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.drawscope.Stroke
 import kotlin.math.*
 
+
+// 10回ごとに変わる色のリスト
+val colorStops = listOf(
+    Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Magenta
+)
+
+fun getSwipeColor(swipeCount: Int): Color {
+    val stage = swipeCount / 10          // 現在の段階（何色目か）
+    val progress = (swipeCount % 10) / 10f // 現段階での進行度（0.0～1.0）
+
+    // ループするようにインデックスを制限
+    val maxIndex = colorStops.size - 1
+    val safeStage = stage % maxIndex
+
+    val startColor = colorStops[safeStage]
+    val endColor = colorStops[(safeStage + 1) % colorStops.size]
+
+    return lerp(startColor, endColor, progress)
+}
+
+
+
 @Composable
 fun TwistedLineCanvas(twistValue: Float, swipeCount: Int, modifier: Modifier = Modifier) {
+    val swipeColor = getSwipeColor(swipeCount)
+
     Canvas(modifier = modifier.fillMaxSize()) {
         val centerX = size.width / 2f
         val heightStep = 20f
@@ -27,12 +52,12 @@ fun TwistedLineCanvas(twistValue: Float, swipeCount: Int, modifier: Modifier = M
             val clampedInfluence = influence.coerceIn(0f, 1f)
 
             if (swipeCount == 0) {
-                for (i in 0 until totalSteps) {
-                    val y = i * heightStep
-                    if (i == 0) path.moveTo(centerX, y)
+                for (j in 0 until totalSteps) {
+                    val y = j * heightStep
+                    if (j == 0) path.moveTo(centerX, y)
                     else path.lineTo(centerX, y)
                 }
-                drawPath(path, color = Color.Black, style = Stroke(width = 8f))
+                drawPath(path, color = swipeColor, style = Stroke(width = 8f))
                 return@Canvas
             }
 
@@ -47,6 +72,6 @@ fun TwistedLineCanvas(twistValue: Float, swipeCount: Int, modifier: Modifier = M
             else path.lineTo(centerX + offsetX, endY)
         }
 
-        drawPath(path = path, color = Color.Black, style = Stroke(width = 8f))
+        drawPath(path = path, color = swipeColor, style = Stroke(width = 8f))
     }
 }

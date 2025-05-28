@@ -16,7 +16,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             Swipe01Theme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    SwipeTwistScreen()
+                    SwipeTwistScreenRoot()  // 状態管理付きの新しいComposable
                 }
             }
         }
