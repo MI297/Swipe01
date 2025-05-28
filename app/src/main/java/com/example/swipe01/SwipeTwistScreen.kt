@@ -12,8 +12,13 @@ import kotlinx.coroutines.launch
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
 import kotlinx.coroutines.CoroutineScope
 
+import androidx.compose.foundation.Image
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.painterResource
 
 @Composable
 fun SwipeTwistScreenRoot() {
@@ -44,6 +49,21 @@ fun SwipeTwistScreen(
     scope: CoroutineScope
 ) {
     var accumulatedDrag by remember { mutableStateOf(0f) }
+    var showTutorial by remember { mutableStateOf(true) } //チュートリアル判定
+    var hasSeenTutorial by rememberSaveable { mutableStateOf(false) }
+    //画像フェードアウト処理判定用
+    val tutorialAlpha by animateFloatAsState(
+        targetValue = if (swipeCount < 5 && (!hasSeenTutorial ) ) 1f else 0f,
+        animationSpec = tween(durationMillis = 1000)
+    )
+
+    // チュートリアル終了判定
+    LaunchedEffect(swipeCount) {
+        if (swipeCount >= 5 ) {
+            showTutorial = false
+            hasSeenTutorial = true
+        }
+    }
 
     val gestureModifier = Modifier.pointerInput(Unit) {
         detectHorizontalDragGestures(
@@ -78,7 +98,20 @@ fun SwipeTwistScreen(
         contentAlignment = Alignment.Center
     ) {
         BackgroundFloatingDots(swipeCount)
+
+        // チュートリアル画像を表示
+        if (!hasSeenTutorial || tutorialAlpha > 0f) {
+            Image(
+                painter = painterResource(id = R.drawable.tutorial_swipe),
+                contentDescription = "Swipe tutorial",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(tutorialAlpha)
+            )
+        }
+
         TwistedLineCanvas(twistAnim.value, swipeCount)
+
         SwipeCounterUI(
             swipeCount = swipeCount,
             onReset = onReset,
