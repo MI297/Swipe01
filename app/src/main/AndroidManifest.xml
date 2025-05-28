@@ -12,10 +12,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Swipe01"
         tools:targetApi="31">
+
+        <!-- SecondActivity を起動アクティビティにする -->
+        <activity
+            android:name=".SecondActivity"
+            android:exported="true"
+
+            android:theme="@style/Theme.Swipe01">
+
+        </activity>
+
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
+
             android:theme="@style/Theme.Swipe01">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,6 +34,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
     </application>
 
 </manifest>

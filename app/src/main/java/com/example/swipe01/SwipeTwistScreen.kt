@@ -19,6 +19,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
+import android.content.Intent
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun SwipeTwistScreenRoot() {
@@ -48,9 +52,10 @@ fun SwipeTwistScreen(
     twistAnim: Animatable<Float, *>,
     scope: CoroutineScope
 ) {
-    var accumulatedDrag by remember { mutableStateOf(0f) }
-    var showTutorial by remember { mutableStateOf(true) } //チュートリアル判定
-    var hasSeenTutorial by rememberSaveable { mutableStateOf(false) }
+    var accumulatedDrag by remember { mutableStateOf(0f) }  //スワイプの動きの勢い
+    var showTutorial by remember { mutableStateOf(true) }   //チュートリアル判定
+    var hasSeenTutorial by rememberSaveable { mutableStateOf(false) }   //チュートリアル再度表示しない
+
     //画像フェードアウト処理判定用
     val tutorialAlpha by animateFloatAsState(
         targetValue = if (swipeCount < 5 && (!hasSeenTutorial ) ) 1f else 0f,
@@ -118,5 +123,16 @@ fun SwipeTwistScreen(
             scope = scope,
             twistAnim = twistAnim
         )
+        val context = LocalContext.current
+        Button(onClick = {
+
+            val intent = Intent(context, SecondActivity::class.java)
+            context.startActivity(intent)
+        }) {
+            Text("SecondActivityを開く")
+        }
     }
+
+
+
 }
