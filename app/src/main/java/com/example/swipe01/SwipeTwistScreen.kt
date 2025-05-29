@@ -1,36 +1,34 @@
 package com.example.swipe01
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.animation.core.*
+import androidx.compose.material3.Text
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 
 @Composable
 fun SwipeTwistScreenRoot() {
-    var swipeCount by remember { mutableStateOf(0) }
+    var swipeCount by remember { mutableIntStateOf(0) }
     val twistAnim = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
 
     var isCutting by remember { mutableStateOf(false) }
     var isCutCompleted by remember { mutableStateOf(false) }
+    var showCutMessage by remember { mutableStateOf(false) }
 
     // 線のスナップショット保持用（切断時）
     var cachedLinePoints by remember { mutableStateOf<List<Offset>?>(null) }
@@ -56,6 +54,14 @@ fun SwipeTwistScreenRoot() {
             launch { cutAnimY.animateTo(200f, tween(1500)) }
         }
     }
+
+    LaunchedEffect(isCutCompleted) {
+        if (isCutCompleted) {
+            delay(1500)
+            showCutMessage = true
+        }
+    }
+
 
     val gestureModifier = Modifier.swipeGestureHandler(
         isCutting = isCutting,
@@ -86,7 +92,6 @@ fun SwipeTwistScreenRoot() {
             .background(Color.White),
         contentAlignment = Alignment.Center
     ) {
-        BackgroundFloatingDots(swipeCount)
 
         if (tutorialAlpha > 0f) {
             Image(
@@ -97,6 +102,9 @@ fun SwipeTwistScreenRoot() {
                     .alpha(tutorialAlpha)
             )
         }
+
+        //背景エフェクト
+        BackgroundFloatingDots(swipeCount)
 
         if (isCutting || isCutCompleted) {
             Canvas(modifier = Modifier.fillMaxSize()) {
@@ -136,8 +144,17 @@ fun SwipeTwistScreenRoot() {
                     )
                 }
             }
+
+            if (showCutMessage) {
+                Text("プツン…切れた！", fontSize = 24.sp, color = Color.Red)
+            }
         } else {
-            TwistedLineCanvas(twistAnim.value, swipeCount)
+            //TwistedLineCanvas(twistAnim.value, swipeCount)
+            TwistedLineCanvasWithCapture(
+                twistValue = twistAnim.value,
+                swipeCount = swipeCount,
+                onCapturePoints = { captured -> cachedLinePoints = captured }
+            )
         }
 
         SwipeCounterUI(
@@ -149,11 +166,18 @@ fun SwipeTwistScreenRoot() {
                 swipeCount = 0
                 isCutting = false
                 isCutCompleted = false
+                showCutMessage = false
                 cachedLinePoints = null
+                scope.launch {
+                    cutAlpha.snapTo(1f)
+                    cutAnimY.snapTo(0f)
+                }
             },
             scope = scope,
             twistAnim = twistAnim
         )
+
+
     }
 }
 
@@ -174,4 +198,45 @@ fun generateTwistedLinePoints(twistValue: Float, canvasWidth: Float, canvasHeigh
         result.add(Offset(centerX + twistOffset, y))
     }
     return result
+}
+
+@Composable
+fun TwistedLineCanvasWithCapture(
+    twistValue: Float,
+    swipeCount: Int,
+    onCapturePoints: (List<Offset>) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val points = remember(twistValue, swipeCount) {
+        generateTwistedLinePoints(twistValue, 1080f, 2400f) // or pass size externally
+    }
+
+    onCapturePoints(points)  // この瞬間にキャプチャさせる
+
+    Canvas(modifier = modifier.fillMaxSize()) {
+        for (i in 1 until points.size) {
+            drawLine(
+                color = getSwipeColor(swipeCount),
+                start = points[i - 1],
+                end = points[i],
+                strokeWidth = 8f
+            )
+        }
+    }
+}
+
+//デバッグ用
+@Composable
+fun DebugText(vararg lines: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(Color.Black.copy(alpha = 0.6f))
+            .padding(8.dp)
+    ) {
+        for (line in lines) {
+            Text(line, color = Color.White, fontSize = 12.sp)
+        }
+    }
 }
