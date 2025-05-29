@@ -1,6 +1,5 @@
 package com.example.swipe01
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,7 +14,6 @@ import androidx.compose.ui.res.painterResource
 import kotlinx.coroutines.launch
 import androidx.compose.animation.core.*
 import androidx.compose.material3.Text
-import androidx.compose.material3.Button
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -229,6 +227,7 @@ fun TwistedLineCanvasWithCapture(
 }
 
 //デバッグ用
+/*
 @Composable
 fun DebugText(vararg lines: String) {
     Column(
@@ -243,3 +242,4 @@ fun DebugText(vararg lines: String) {
         }
     }
 }
+*/
