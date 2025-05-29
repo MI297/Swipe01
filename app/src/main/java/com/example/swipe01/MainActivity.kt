@@ -13,10 +13,10 @@ import android.util.Log
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        SoundPoolManager.initialize(this)
         setContent {
             Swipe01Theme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    Log.d("MainActivity", "Main started")
                     SwipeTwistScreenRoot()  // 状態管理付きの新しいComposable
                 }
             }

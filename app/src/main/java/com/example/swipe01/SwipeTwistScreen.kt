@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.animation.core.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
@@ -28,6 +29,9 @@ fun SwipeTwistScreenRoot() {
     var isCutting by remember { mutableStateOf(false) }
     var isCutCompleted by remember { mutableStateOf(false) }
     var showCutMessage by remember { mutableStateOf(false) }
+
+    //効果音再生用
+    val context = LocalContext.current
 
     // 線のスナップショット保持用（切断時）
     var cachedLinePoints by remember { mutableStateOf<List<Offset>?>(null) }
@@ -67,6 +71,7 @@ fun SwipeTwistScreenRoot() {
         isCutCompleted = isCutCompleted,
         scope = scope,
         onSwipeTwist = {
+            SoundPoolManager.playTwistSound()  //効果音再生
             swipeCount++
             scope.launch {
                 twistAnim.animateTo(
@@ -78,6 +83,7 @@ fun SwipeTwistScreenRoot() {
         onCutStart = {
             isCutting = true
             // cachedLinePoints は Canvas 側で初回に生成する
+            SoundPoolManager.playCutSound() //効果音
         },
         onCutFinish = {
             isCutting = false
