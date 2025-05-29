@@ -13,15 +13,6 @@
         android:theme="@style/Theme.Swipe01"
         tools:targetApi="31">
 
-        <!-- SecondActivity を起動アクティビティにする -->
-        <activity
-            android:name=".SecondActivity"
-            android:exported="true"
-
-            android:theme="@style/Theme.Swipe01">
-
-        </activity>
-
 
         <activity
             android:name=".MainActivity"

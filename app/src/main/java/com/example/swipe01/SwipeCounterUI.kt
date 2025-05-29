@@ -50,7 +50,7 @@ fun SwipeCounterUI(
                 .align(Alignment.Start)
                 .size(width = 120.dp, height = 36.dp)
         ) {
-            Text("!!!リセット!!!", fontSize = 12.sp)
+            Text("リセット", fontSize = 12.sp)
         }
     }
 }

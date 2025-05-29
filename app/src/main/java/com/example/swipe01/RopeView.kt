@@ -8,7 +8,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import kotlin.math.sqrt
-
+/*
 class RopeView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : View(context, attrs) {
@@ -66,3 +66,4 @@ class RopeView @JvmOverloads constructor(
         return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
     }
 }
+*/

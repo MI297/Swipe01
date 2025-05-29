@@ -5,6 +5,7 @@ import android.widget.Button
 import android.util.Log
 import androidx.activity.ComponentActivity
 
+/*
 class SecondActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,3 +21,4 @@ class SecondActivity : ComponentActivity() {
         Log.d("SecondActivity", "SecondActivity started")
     }
 }
+*/
