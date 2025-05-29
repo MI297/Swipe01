@@ -15,6 +15,7 @@ import androidx.compose.ui.res.painterResource
 import kotlinx.coroutines.launch
 import androidx.compose.animation.core.*
 import androidx.compose.material3.Text
+import androidx.compose.material3.Button
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -157,27 +158,29 @@ fun SwipeTwistScreenRoot() {
             )
         }
 
-        SwipeCounterUI(
-            swipeCount = swipeCount,
-            onReset = {
-                scope.launch {
-                    twistAnim.animateTo(0f, tween(800, easing = LinearOutSlowInEasing))
-                }
-                swipeCount = 0
-                isCutting = false
-                isCutCompleted = false
-                showCutMessage = false
-                cachedLinePoints = null
-                scope.launch {
-                    cutAlpha.snapTo(1f)
-                    cutAnimY.snapTo(0f)
-                }
-            },
-            scope = scope,
-            twistAnim = twistAnim
-        )
-
-
+        if (!isCutting) {
+            SwipeCounterUI(
+                swipeCount = swipeCount,
+                onReset = {
+                    if (!isCutting) {
+                        scope.launch {
+                            twistAnim.animateTo(0f, tween(800, easing = LinearOutSlowInEasing))
+                        }
+                        swipeCount = 0
+                        isCutting = false
+                        isCutCompleted = false
+                        showCutMessage = false
+                        cachedLinePoints = null
+                        scope.launch {
+                            cutAlpha.snapTo(1f)
+                            cutAnimY.snapTo(0f)
+                        }
+                    }
+                },
+                scope = scope,
+                twistAnim = twistAnim
+            )
+        }
     }
 }
 
