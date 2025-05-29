@@ -37,9 +37,12 @@ object SoundPoolManager {
         if (isLoaded) soundPool?.play(cutSoundId, 1f, 1f, 0, 0, 1f)
     }
 
+/*
     fun release() {
         soundPool?.release()
         soundPool = null
         isLoaded = false
     }
+
+ */
 }

@@ -15,8 +15,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.animation.core.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
+
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
@@ -30,8 +29,6 @@ fun SwipeTwistScreenRoot() {
     var isCutCompleted by remember { mutableStateOf(false) }
     var showCutMessage by remember { mutableStateOf(false) }
 
-    //効果音再生用
-    val context = LocalContext.current
 
     // 線のスナップショット保持用（切断時）
     var cachedLinePoints by remember { mutableStateOf<List<Offset>?>(null) }
