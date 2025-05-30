@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.animation.core.*
 import androidx.compose.ui.platform.LocalContext
 import com.example.swipe01.SoundPoolManager
+import com.example.swipe01.SwipeCounterUI
 
 @Composable
 fun SwipeTwistScreenRoot() {
@@ -112,6 +113,13 @@ fun SwipeTwistScreenRoot() {
 
         // 背景水玉（最背面）
         BackgroundFloatingDots(swipeCount)
+        //　中間背景描画処理
+        DrawBackgroundLayer(
+            styleIndex = backgroundStyleIndex,
+            variants = backgroundColors
+        )
+        // 枠描画
+        DrawFrameBorderIfNeeded(backgroundStyleIndex)
 
         // 線または切断線
         if (isCutting || isCutCompleted) {
@@ -164,17 +172,6 @@ fun SwipeTwistScreenRoot() {
             )
         }
 
-        // 枠（線の上・UIの下）
-        if (backgroundStyleIndex == 1) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                drawRect(
-                    color = Color.Cyan,
-                    size = size,
-                    style = Stroke(width = 16f)
-                )
-            }
-        }
-
         // UI（最前面）
         if (!isCutting) {
             SwipeCounterUI(
@@ -199,19 +196,13 @@ fun SwipeTwistScreenRoot() {
                 backgroundStyleIndex = backgroundStyleIndex
             )
 
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(start = 16.dp, bottom = 120.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Button(onClick = { buttonStyleIndex = (buttonStyleIndex + 1) % 3 }) {
-                    Text("ボタン切替")
-                }
-                Button(onClick = { backgroundStyleIndex = (backgroundStyleIndex + 1) % 2 }) {
-                    Text("背景切替")
-                }
-            }
+            StyleSwitchButtons(
+                buttonStyleIndex = buttonStyleIndex,
+                backgroundStyleIndex = backgroundStyleIndex,
+                onButtonStyleChange = { buttonStyleIndex = (buttonStyleIndex + 1) % 3 },
+                onBackgroundStyleChange = { backgroundStyleIndex = (backgroundStyleIndex + 1) % backgroundColors.size } // ← 例: 0〜2 の3種類
+            )
+
         }
     }
 }
