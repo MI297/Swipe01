@@ -1,29 +1,22 @@
 package com.example.swipe01
 
-import android.util.Log
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.animation.core.*
 import androidx.compose.ui.platform.LocalContext
-import com.example.swipe01.SoundPoolManager
-import com.example.swipe01.SwipeCounterUI
 
 @Composable
 fun SwipeTwistScreenRoot() {
@@ -108,6 +101,7 @@ fun SwipeTwistScreenRoot() {
 
     var buttonStyleIndex by remember { mutableIntStateOf(0) }
     var backgroundStyleIndex by remember { mutableIntStateOf(0) }
+    var flameStyleIndex by remember { mutableIntStateOf(0) }
 
     Box(modifier = gestureModifier.fillMaxSize()) {
 
@@ -119,7 +113,10 @@ fun SwipeTwistScreenRoot() {
             variants = backgroundColors
         )
         // 枠描画
-        DrawFrameBorderIfNeeded(backgroundStyleIndex)
+        DrawFrameBorderIfNeeded(
+            styleIndex = flameStyleIndex,
+            variants = flameColors
+        )
 
         // 線または切断線
         if (isCutting || isCutCompleted) {
@@ -193,14 +190,15 @@ fun SwipeTwistScreenRoot() {
                 scope = scope,
                 twistAnim = twistAnim,
                 buttonStyleIndex = buttonStyleIndex,
+                flameStyleIndex = flameStyleIndex,
                 backgroundStyleIndex = backgroundStyleIndex
             )
 
             StyleSwitchButtons(
-                buttonStyleIndex = buttonStyleIndex,
-                backgroundStyleIndex = backgroundStyleIndex,
-                onButtonStyleChange = { buttonStyleIndex = (buttonStyleIndex + 1) % 3 },
-                onBackgroundStyleChange = { backgroundStyleIndex = (backgroundStyleIndex + 1) % backgroundColors.size } // ← 例: 0〜2 の3種類
+                onButtonStyleChange = { buttonStyleIndex = (buttonStyleIndex + 1) % buttonColors.size },
+                onFrameStyleChange = { flameStyleIndex = (flameStyleIndex + 1) % flameColors.size },
+                onBackgroundStyleChange = { backgroundStyleIndex = (backgroundStyleIndex + 1) % backgroundColors.size }
+
             )
 
         }
