@@ -1,4 +1,4 @@
-package com.example.swipe01
+package com.example.swipe01  // ← 実際のパッケージ名に揃える
 
 import android.content.Context
 import android.media.AudioAttributes
@@ -37,12 +37,9 @@ object SoundPoolManager {
         if (isLoaded) soundPool?.play(cutSoundId, 1f, 1f, 0, 0, 1f)
     }
 
-/*
     fun release() {
         soundPool?.release()
         soundPool = null
         isLoaded = false
     }
-
- */
 }

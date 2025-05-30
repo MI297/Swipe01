@@ -1,23 +1,28 @@
 package com.example.swipe01
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
-import kotlinx.coroutines.launch
-import androidx.compose.animation.core.*
-import androidx.compose.material3.Text
-import androidx.compose.runtime.saveable.rememberSaveable
-
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import androidx.compose.animation.core.*
+import androidx.compose.ui.platform.LocalContext
+import com.example.swipe01.SoundPoolManager
 
 @Composable
 fun SwipeTwistScreenRoot() {
@@ -29,11 +34,8 @@ fun SwipeTwistScreenRoot() {
     var isCutCompleted by remember { mutableStateOf(false) }
     var showCutMessage by remember { mutableStateOf(false) }
 
-
-    // 線のスナップショット保持用（切断時）
     var cachedLinePoints by remember { mutableStateOf<List<Offset>?>(null) }
 
-    // チュートリアル制御（初回のみ表示）
     var hasSeenTutorial by rememberSaveable { mutableStateOf(false) }
     val tutorialAlpha by animateFloatAsState(
         targetValue = if (swipeCount < 5 && !hasSeenTutorial && !isCutting) 1f else 0f,
@@ -43,15 +45,34 @@ fun SwipeTwistScreenRoot() {
         if (swipeCount >= 5) hasSeenTutorial = true
     }
 
-    // 切断アニメーション：線のフェードと落下用
     val cutAlpha = remember { Animatable(1f) }
     val cutAnimY = remember { Animatable(0f) }
+
+    // Sound
+    val context = LocalContext.current
+
+
     LaunchedEffect(isCutting) {
         if (isCutting) {
+            // Capture current line shape immediately
+            if (cachedLinePoints == null) {
+                cachedLinePoints = generateTwistedLinePoints(
+                    twistAnim.value,
+                    context.resources.displayMetrics.widthPixels.toFloat(),
+                    context.resources.displayMetrics.heightPixels.toFloat()
+                )
+            }
+            //soundPoolManager.playCutSound()
             cutAlpha.snapTo(1f)
             cutAnimY.snapTo(0f)
             launch { cutAlpha.animateTo(0f, tween(1500)) }
             launch { cutAnimY.animateTo(200f, tween(1500)) }
+        }
+    }
+
+    LaunchedEffect(twistAnim.value) {
+        if (!isCutting && !isCutCompleted) {
+            //soundPoolManager.playTwistSound()
         }
     }
 
@@ -62,13 +83,11 @@ fun SwipeTwistScreenRoot() {
         }
     }
 
-
     val gestureModifier = Modifier.swipeGestureHandler(
         isCutting = isCutting,
         isCutCompleted = isCutCompleted,
         scope = scope,
         onSwipeTwist = {
-            SoundPoolManager.playTwistSound()  //効果音再生
             swipeCount++
             scope.launch {
                 twistAnim.animateTo(
@@ -79,8 +98,6 @@ fun SwipeTwistScreenRoot() {
         },
         onCutStart = {
             isCutting = true
-            // cachedLinePoints は Canvas 側で初回に生成する
-            SoundPoolManager.playCutSound() //効果音
         },
         onCutFinish = {
             isCutting = false
@@ -88,43 +105,22 @@ fun SwipeTwistScreenRoot() {
         }
     )
 
-    Box(
-        modifier = gestureModifier
-            .fillMaxSize()
-            .background(Color.White),
-        contentAlignment = Alignment.Center
-    ) {
+    var buttonStyleIndex by remember { mutableIntStateOf(0) }
+    var backgroundStyleIndex by remember { mutableIntStateOf(0) }
 
-        if (tutorialAlpha > 0f) {
-            Image(
-                painter = painterResource(id = R.drawable.tutorial_swipe),
-                contentDescription = "Swipe tutorial",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(tutorialAlpha)
-            )
-        }
+    Box(modifier = gestureModifier.fillMaxSize()) {
 
-        //背景エフェクト
+        // 背景水玉（最背面）
         BackgroundFloatingDots(swipeCount)
 
+        // 線または切断線
         if (isCutting || isCutCompleted) {
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val midY = size.height / 2f
-
-                if (cachedLinePoints == null) {
-                    cachedLinePoints = generateTwistedLinePoints(
-                        twistAnim.value,
-                        size.width,
-                        size.height
-                    )
-                }
-
                 val points = cachedLinePoints ?: return@Canvas
                 val upper = points.filter { it.y <= midY }
                 val lower = points.filter { it.y > midY }
 
-                // 上半分（固定）
                 for (i in 1 until upper.size) {
                     drawLine(
                         color = Color.Red.copy(alpha = cutAlpha.value),
@@ -134,7 +130,6 @@ fun SwipeTwistScreenRoot() {
                     )
                 }
 
-                // 下半分（落下）
                 for (i in 1 until lower.size) {
                     val start = lower[i - 1] + Offset(0f, cutAnimY.value)
                     val end = lower[i] + Offset(0f, cutAnimY.value)
@@ -151,7 +146,6 @@ fun SwipeTwistScreenRoot() {
                 Text("プツン…切れた！", fontSize = 24.sp, color = Color.Red)
             }
         } else {
-            //TwistedLineCanvas(twistAnim.value, swipeCount)
             TwistedLineCanvasWithCapture(
                 twistValue = twistAnim.value,
                 swipeCount = swipeCount,
@@ -159,28 +153,65 @@ fun SwipeTwistScreenRoot() {
             )
         }
 
+        // チュートリアル画像（中間）
+        if (tutorialAlpha > 0f) {
+            Image(
+                painter = painterResource(id = R.drawable.tutorial_swipe),
+                contentDescription = "Swipe tutorial",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(tutorialAlpha)
+            )
+        }
+
+        // 枠（線の上・UIの下）
+        if (backgroundStyleIndex == 1) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                drawRect(
+                    color = Color.Cyan,
+                    size = size,
+                    style = Stroke(width = 16f)
+                )
+            }
+        }
+
+        // UI（最前面）
         if (!isCutting) {
             SwipeCounterUI(
                 swipeCount = swipeCount,
                 onReset = {
-                    if (!isCutting) {
-                        scope.launch {
-                            twistAnim.animateTo(0f, tween(800, easing = LinearOutSlowInEasing))
-                        }
-                        swipeCount = 0
-                        isCutting = false
-                        isCutCompleted = false
-                        showCutMessage = false
-                        cachedLinePoints = null
-                        scope.launch {
-                            cutAlpha.snapTo(1f)
-                            cutAnimY.snapTo(0f)
-                        }
+                    scope.launch {
+                        twistAnim.animateTo(0f, tween(800, easing = LinearOutSlowInEasing))
+                    }
+                    swipeCount = 0
+                    isCutting = false
+                    isCutCompleted = false
+                    showCutMessage = false
+                    cachedLinePoints = null
+                    scope.launch {
+                        cutAlpha.snapTo(1f)
+                        cutAnimY.snapTo(0f)
                     }
                 },
                 scope = scope,
-                twistAnim = twistAnim
+                twistAnim = twistAnim,
+                buttonStyleIndex = buttonStyleIndex,
+                backgroundStyleIndex = backgroundStyleIndex
             )
+
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 16.dp, bottom = 120.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Button(onClick = { buttonStyleIndex = (buttonStyleIndex + 1) % 3 }) {
+                    Text("ボタン切替")
+                }
+                Button(onClick = { backgroundStyleIndex = (backgroundStyleIndex + 1) % 2 }) {
+                    Text("背景切替")
+                }
+            }
         }
     }
 }
@@ -203,46 +234,3 @@ fun generateTwistedLinePoints(twistValue: Float, canvasWidth: Float, canvasHeigh
     }
     return result
 }
-
-@Composable
-fun TwistedLineCanvasWithCapture(
-    twistValue: Float,
-    swipeCount: Int,
-    onCapturePoints: (List<Offset>) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val points = remember(twistValue, swipeCount) {
-        generateTwistedLinePoints(twistValue, 1080f, 2400f) // or pass size externally
-    }
-
-    onCapturePoints(points)  // この瞬間にキャプチャさせる
-
-    Canvas(modifier = modifier.fillMaxSize()) {
-        for (i in 1 until points.size) {
-            drawLine(
-                color = getSwipeColor(swipeCount),
-                start = points[i - 1],
-                end = points[i],
-                strokeWidth = 8f
-            )
-        }
-    }
-}
-
-//デバッグ用
-/*
-@Composable
-fun DebugText(vararg lines: String) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .background(Color.Black.copy(alpha = 0.6f))
-            .padding(8.dp)
-    ) {
-        for (line in lines) {
-            Text(line, color = Color.White, fontSize = 12.sp)
-        }
-    }
-}
-*/

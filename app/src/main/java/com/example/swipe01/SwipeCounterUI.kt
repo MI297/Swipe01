@@ -40,9 +40,9 @@ fun SwipeCounterUI(
     val backgroundColor = backgroundColors.getOrElse(backgroundStyleIndex) { Color.White }
 
     Surface(
+        color = Color.Transparent,
         modifier = Modifier
-            .fillMaxSize()
-            .background(backgroundColor)
+            .wrapContentSize()  // ← サイズに合わせる
             .padding(16.dp)
     ) {
         Column(
@@ -72,7 +72,7 @@ fun SwipeCounterUI(
                     .align(Alignment.Start)
                     .size(width = 120.dp, height = 36.dp)
             ) {
-                Text("!!!リセット!!!", fontSize = 12.sp)
+                Text("リセット", fontSize = 12.sp)
             }
         }
     }
