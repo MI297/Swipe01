@@ -18,8 +18,11 @@ import kotlinx.coroutines.launch
 import androidx.compose.animation.core.*
 import androidx.compose.ui.platform.LocalContext
 
+
 @Composable
 fun SwipeTwistScreenRoot() {
+
+    var firstSwipeDone by remember { mutableStateOf(false) } // 最初のスワイプ検知をトリガーとして管理
     var swipeCount by remember { mutableIntStateOf(0) }
     val twistAnim = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
@@ -82,6 +85,7 @@ fun SwipeTwistScreenRoot() {
         isCutCompleted = isCutCompleted,
         scope = scope,
         onSwipeTwist = {
+            if (!firstSwipeDone) firstSwipeDone = true  //バナー広告　←　初回スワイプ後
             swipeCount++
             scope.launch {
                 twistAnim.animateTo(
@@ -169,6 +173,7 @@ fun SwipeTwistScreenRoot() {
             )
         }
 
+
         // UI（最前面）
         if (!isCutting) {
             SwipeCounterUI(
@@ -200,6 +205,7 @@ fun SwipeTwistScreenRoot() {
                 onBackgroundStyleChange = { backgroundStyleIndex = (backgroundStyleIndex + 1) % backgroundColors.size }
 
             )
+            BannerAdMockController(firstSwipeDone);
 
         }
     }
