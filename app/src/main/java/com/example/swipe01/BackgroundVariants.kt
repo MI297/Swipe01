@@ -38,7 +38,7 @@ data class BoxState(
 
 //四角形が降ってくるエフェクト
 @Composable
-fun BackgroundSquares(swipeCount: Int) {
+fun BackgroundSquares() {
     val boxCount = 20
     val boxStates = remember { mutableStateListOf<BoxState>() }
     val redrawTrigger = remember { mutableIntStateOf(0) }
@@ -98,8 +98,10 @@ fun BackgroundSquares(swipeCount: Int) {
                     style = Stroke(width = 2f)
                 )
             }
+            val redrawTrigger_value = redrawTrigger.value  // 再描画が発生
         }
 
+        /*
         // Debug表示：画面左上に再描画カウンター表示
 
         Text(
@@ -112,6 +114,8 @@ fun BackgroundSquares(swipeCount: Int) {
                 .background(Color.White.copy(alpha = 0.7f))
                 .padding(4.dp)
         )
+
+         */
 
 
     }
@@ -129,7 +133,7 @@ data class TriangleState(
 
 //三角形が漂うエフェクト
 @Composable
-fun BackgroundTriangles(swipeCount: Int) {
+fun BackgroundTriangles() {
     val triangleCount = 20
     val triangleStates = remember { mutableStateListOf<TriangleState>() }
     val redrawTrigger = remember { mutableIntStateOf(0) }
@@ -198,10 +202,10 @@ fun BackgroundTriangles(swipeCount: Int) {
                     drawPath(path = path, color = Color.White, style = Stroke(width = 2f))
                 }
             }
+            val redrawTrigger_value = redrawTrigger.value  // 再描画が発生
         }
-
+/*
         // Debug表示
-
         Text(
             text = "Redraw: ${redrawTrigger.value}",
             color = Color.Black,
@@ -212,14 +216,14 @@ fun BackgroundTriangles(swipeCount: Int) {
                 .background(Color.White.copy(alpha = 0.7f))
                 .padding(4.dp)
         )
-
+*/
     }
 }
 
 
 //仮背景エフェクトパターン３
 @Composable
-fun TestBackground3(swipeCount: Int) {
+fun TestBackground3() {
     Canvas(modifier = Modifier.fillMaxSize()) {
         // 仮演出
         drawRect(Color(0xAFAAFFFA))

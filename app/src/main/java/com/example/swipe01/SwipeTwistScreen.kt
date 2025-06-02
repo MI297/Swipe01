@@ -107,9 +107,9 @@ fun SwipeTwistScreenRoot() {
 
         // 1=>背景水玉（最背面） 2=>test用追加背景スタイル
         when (backgroundStyleIndex) {
-            3 -> TestBackground3(swipeCount)
-            2 -> BackgroundTriangles(swipeCount)
-            1 -> BackgroundSquares(swipeCount)  // index == 2 のときだけ別背景に
+            3 -> TestBackground3()
+            2 -> BackgroundTriangles()
+            1 -> BackgroundSquares()  // index == 2 のときだけ別背景に
             else -> BackgroundFloatingDots(swipeCount)  // 通常は水玉背景
         }
 
