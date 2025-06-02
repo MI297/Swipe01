@@ -20,6 +20,14 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
+//パターン数
+object BackgroundStyles {
+    const val MAX = 3
+    val styleNames = listOf(
+        "水玉", "落下四角", "回転三角"
+    )
+}
+
 // 状態クラス
 data class BoxState(
     var x: Float,
@@ -30,7 +38,7 @@ data class BoxState(
 
 //四角形が降ってくるエフェクト
 @Composable
-fun TestBackground1(swipeCount: Int) {
+fun BackgroundSquares(swipeCount: Int) {
     val boxCount = 20
     val boxStates = remember { mutableStateListOf<BoxState>() }
     val redrawTrigger = remember { mutableIntStateOf(0) }
@@ -41,9 +49,9 @@ fun TestBackground1(swipeCount: Int) {
         repeat(boxCount) {
             boxStates += BoxState(
                 x = Random.nextFloat() * 1080f,
-                y = Random.nextFloat() * -200f,
-                size = 40f + Random.nextFloat() * 30f,
-                speed = 0.5f + Random.nextFloat() * 1.5f
+                y = -100f + Random.nextFloat() * -400f,
+                size = 100f + Random.nextFloat() * 50f,
+                speed = 1f + Random.nextFloat() * 1.5f
             )
         }
     }
@@ -57,9 +65,9 @@ fun TestBackground1(swipeCount: Int) {
             while (boxStates.size < boxCount) {
                 boxStates += BoxState(
                     x = Random.nextFloat() * 1080f,
-                    y = Random.nextFloat() * -200f,
-                    size = 40f + Random.nextFloat() * 30f,
-                    speed = 0.5f + Random.nextFloat() * 1.5f
+                    y = -100f + Random.nextFloat() * -400f,
+                    size = 100f + Random.nextFloat() * 50f,
+                    speed = 1f + Random.nextFloat() * 1.5f
                 )
             }
             redrawTrigger.value++  // Composeに明示的な再描画を促す
@@ -93,6 +101,7 @@ fun TestBackground1(swipeCount: Int) {
         }
 
         // Debug表示：画面左上に再描画カウンター表示
+
         Text(
             text = "Redraw: ${redrawTrigger.value}",
             color = Color.Black,
@@ -103,6 +112,8 @@ fun TestBackground1(swipeCount: Int) {
                 .background(Color.White.copy(alpha = 0.7f))
                 .padding(4.dp)
         )
+
+
     }
 }
 
@@ -118,7 +129,7 @@ data class TriangleState(
 
 //三角形が漂うエフェクト
 @Composable
-fun TestBackground2(swipeCount: Int) {
+fun BackgroundTriangles(swipeCount: Int) {
     val triangleCount = 20
     val triangleStates = remember { mutableStateListOf<TriangleState>() }
     val redrawTrigger = remember { mutableIntStateOf(0) }
@@ -190,6 +201,7 @@ fun TestBackground2(swipeCount: Int) {
         }
 
         // Debug表示
+
         Text(
             text = "Redraw: ${redrawTrigger.value}",
             color = Color.Black,
@@ -200,6 +212,7 @@ fun TestBackground2(swipeCount: Int) {
                 .background(Color.White.copy(alpha = 0.7f))
                 .padding(4.dp)
         )
+
     }
 }
 
@@ -212,63 +225,3 @@ fun TestBackground3(swipeCount: Int) {
         drawRect(Color(0xAFAAFFFA))
     }
 }
-
-/*
-@Composable
-fun TestBackground(swipeCount: Int) {
-    val scope = rememberCoroutineScope()
-    val dotCount = 10   // ドットの数
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-
-    // ドットの初期位置と半径をランダムに決定
-    val dots = remember {
-        List(dotCount) {
-            DotState(
-                x = Animatable((0..screenWidth.value.toInt()).random().toFloat()),
-                y = Animatable((0..screenHeight.value.toInt()).random().toFloat()),
-                radius = (60..100).random().toFloat()
-            )
-        }
-    }
-
-    // スワイプ時にドットがふわっと上に浮かぶ
-    LaunchedEffect(swipeCount) {
-        dots.forEach { dot ->
-            scope.launch {
-                dot.y.animateTo(dot.y.value - 10f, animationSpec = tween(500))
-            }
-        }
-    }
-
-    // ドットがゆっくり上に動くループ処理
-    LaunchedEffect(Unit) {
-        while (true) {
-            dots.forEach { dot ->
-                scope.launch {
-                    val nextY = dot.y.value - 1f
-                    val nextX = dot.x.value + listOf(-1f, 0f, 1f).random()
-                    dot.y.snapTo(if (nextY < 0) screenHeight.value else nextY)
-                    dot.x.snapTo(nextX.coerceIn(0f, screenWidth.value))
-                }
-            }
-            delay(30)
-        }
-    }
-
-    // ドットを円として描画
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        dots.forEach { dot ->
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(Color.LightGray.copy(alpha = 0.5f), Color.Cyan.copy(alpha = 0.1f)),
-                    center = Offset(dot.x.value.dp.toPx(), dot.y.value.dp.toPx()),
-                    radius = dot.radius.dp.toPx()
-                ),
-                center = Offset(dot.x.value.dp.toPx(), dot.y.value.dp.toPx()),
-                radius = dot.radius.dp.toPx()
-            )
-        }
-    }
-}
-*/

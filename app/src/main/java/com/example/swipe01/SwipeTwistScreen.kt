@@ -108,18 +108,10 @@ fun SwipeTwistScreenRoot() {
         // 1=>背景水玉（最背面） 2=>test用追加背景スタイル
         when (backgroundStyleIndex) {
             3 -> TestBackground3(swipeCount)
-            2 -> TestBackground2(swipeCount)
-            1 -> TestBackground1(swipeCount)  // index == 2 のときだけ別背景に
+            2 -> BackgroundTriangles(swipeCount)
+            1 -> BackgroundSquares(swipeCount)  // index == 2 のときだけ別背景に
             else -> BackgroundFloatingDots(swipeCount)  // 通常は水玉背景
         }
-
-        //　中間背景描画処理
-        /*
-        DrawBackgroundLayer(
-            styleIndex = backgroundStyleIndex,
-            variants = backgroundColors
-        )
-        */
 
         // 枠描画
         DrawFrameBorderIfNeeded(
@@ -206,7 +198,7 @@ fun SwipeTwistScreenRoot() {
             StyleSwitchButtons(
                 onButtonStyleChange = { buttonStyleIndex = (buttonStyleIndex + 1) % buttonColors.size },
                 onFrameStyleChange = { flameStyleIndex = (flameStyleIndex + 1) % flameColors.size },
-                onBackgroundStyleChange = { backgroundStyleIndex = (backgroundStyleIndex + 1) % backgroundColors.size }
+                onBackgroundStyleChange = { backgroundStyleIndex = (backgroundStyleIndex + 1) % BackgroundStyles.MAX }
 
             )
 
