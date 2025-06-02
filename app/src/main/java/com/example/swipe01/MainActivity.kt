@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import com.example.swipe01.ui.theme.Swipe01Theme
 
 class MainActivity : ComponentActivity() {
+    //
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         SoundPoolManager.initialize(this)
