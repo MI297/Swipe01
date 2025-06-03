@@ -1,3 +1,4 @@
+// UIと状態管理の中心。背景・線・UIの統合管理。
 package com.example.swipe01
 
 import androidx.compose.foundation.layout.*

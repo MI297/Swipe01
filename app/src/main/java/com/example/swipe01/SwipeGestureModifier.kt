@@ -1,3 +1,4 @@
+// スワイプ操作を検出し、TwistまたはCutアクションをトリガー
 package com.example.swipe01
 
 import androidx.compose.ui.Modifier

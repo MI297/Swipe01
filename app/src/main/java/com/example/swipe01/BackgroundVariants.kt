@@ -1,4 +1,4 @@
-//背景パターン追加テスト
+//背景パターン追加
 package com.example.swipe01
 
 import androidx.compose.foundation.Canvas

@@ -1,3 +1,4 @@
+// 線のアニメーション描画を実装
 package com.example.swipe01
 
 import androidx.compose.foundation.Canvas
@@ -13,7 +14,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import kotlin.math.*
 
 
-// 10回ごとに変わる色のリスト
+// 10回ごとに変わる色のリスト(※旧仕様)
 val colorStops = listOf(
     Color.Red, Color.Blue, Color.Green, Color.Yellow, Color.Magenta
 )

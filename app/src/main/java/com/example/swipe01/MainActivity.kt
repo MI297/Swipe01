@@ -1,4 +1,5 @@
-//
+// アプリ起動時のエントリポイント
+//SwipeTwistScreen を呼び出す。
 package com.example.swipe01
 
 import android.os.Bundle
@@ -13,7 +14,7 @@ class MainActivity : ComponentActivity() {
     //
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        SoundPoolManager.initialize(this)
+        SoundPoolManager.initialize(this)  // サウンドマネージャー呼び出し
         setContent {
             Swipe01Theme {
                 Surface(modifier = Modifier.fillMaxSize()) {

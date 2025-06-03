@@ -1,5 +1,5 @@
+// UIと状態管理の中心。背景・線・UIの統合管理。
 package com.example.swipe01
-
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -20,17 +20,19 @@ import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun SwipeTwistScreenRoot() {
-    var swipeCount by remember { mutableIntStateOf(0) }
-    val twistAnim = remember { Animatable(0f) }
+    var swipeCount by remember { mutableIntStateOf(0) }         //スワイプ回数
+    val twistAnim = remember { Animatable(0f) }             //
     val scope = rememberCoroutineScope()
 
-    var isCutting by remember { mutableStateOf(false) }
-    var isCutCompleted by remember { mutableStateOf(false) }
+    var isCutting by remember { mutableStateOf(false) }         //cutモード状態管理
+    var isCutCompleted by remember { mutableStateOf(false) }    //cutアニメーション終了
     var showCutMessage by remember { mutableStateOf(false) }
 
     var cachedLinePoints by remember { mutableStateOf<List<Offset>?>(null) }
 
     var hasSeenTutorial by rememberSaveable { mutableStateOf(false) }
+
+    // チュートリアルモード切替条件　スワイプ5回で終了
     val tutorialAlpha by animateFloatAsState(
         targetValue = if (swipeCount < 5 && !hasSeenTutorial && !isCutting) 1f else 0f,
         animationSpec = tween(1000)
@@ -39,10 +41,9 @@ fun SwipeTwistScreenRoot() {
         if (swipeCount >= 5) hasSeenTutorial = true
     }
 
+    // cutモード
     val cutAlpha = remember { Animatable(1f) }
     val cutAnimY = remember { Animatable(0f) }
-
-    // Sound
     val context = LocalContext.current
 
 
@@ -56,7 +57,7 @@ fun SwipeTwistScreenRoot() {
                     context.resources.displayMetrics.heightPixels.toFloat()
                 )
             }
-            //soundPoolManager.playCutSound()
+            SoundPoolManager.playCutSound() //効果音再生
             cutAlpha.snapTo(1f)
             cutAnimY.snapTo(0f)
             launch { cutAlpha.animateTo(0f, tween(1500)) }
@@ -66,7 +67,7 @@ fun SwipeTwistScreenRoot() {
 
     LaunchedEffect(twistAnim.value) {
         if (!isCutting && !isCutCompleted) {
-            //soundPoolManager.playTwistSound()
+            SoundPoolManager.playTwistSound()  //効果音再生
         }
     }
 

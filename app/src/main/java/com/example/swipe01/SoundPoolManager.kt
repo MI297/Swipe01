@@ -1,4 +1,5 @@
-package com.example.swipe01  // ← 実際のパッケージ名に揃える
+// 効果音の再生
+package com.example.swipe01
 
 import android.content.Context
 import android.media.AudioAttributes
