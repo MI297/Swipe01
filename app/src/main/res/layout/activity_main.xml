@@ -7,11 +7,6 @@
     android:gravity="center"
     android:background="#FFFFFF">
 
-    <com.example.swipe01.RopeView
-        android:id="@+id/RopeView"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_margin="16dp" />
 
     <Button
         android:id="@+id/resetButton"
