@@ -24,6 +24,7 @@ fun StyleSelector(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+
         // 背景スタイル選択
         Text("背景スタイルを選択:")
         DropdownSelector(
