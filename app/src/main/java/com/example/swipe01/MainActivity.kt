@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import com.example.swipe01.ui.theme.Swipe01Theme
 
+private const val SHOW_TEST_SCREEN = false //テストモードの切り替え
+
 class MainActivity : ComponentActivity() {
     //
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,7 +20,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             Swipe01Theme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    SwipeTwistScreenRoot()  // 状態管理付きの新しいComposable
+                    if(SHOW_TEST_SCREEN) {
+                        TestScreen()    //テスト用モード
+                    } else {
+                        SwipeTwistScreenRoot()  // メイン処理
+                    }
                 }
             }
         }
