@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import com.example.swipe01.ui.theme.Swipe01Theme
 
-private const val TEST_SCREEN = true //テストモードの切り替え
+private const val TEST_SCREEN = false //テストモードの切り替え
 
 class MainActivity : ComponentActivity() {
     //
